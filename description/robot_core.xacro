@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Includes -->
-  <!-- <xacro:include filename="inertial_macros.xacro"/> -->
+  <xacro:include filename="inertial_macros.xacro"/>
 
   <!-- Materials -->
   <material name="silver">
@@ -10,11 +10,25 @@
   </material>
 
   <!-- World and Base Reference -->
-  <link name="world"/>
+
+  <link name="universe">
+
+  <!-- Probably edit world joint origin to move gripper start position arround-->
   
   <joint name="world_joint" type="fixed">
-    <parent link="world"/>
+    <parent link="universe"/>
+    <child link="world"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="world"/>
+
+  </link>
+
+  <joint name="base_link_joint" type="fixed">
+    <parent link="universe"/>
     <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
   <!-- Link Definitions -->

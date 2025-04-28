@@ -5,6 +5,7 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch.actions import TimerAction
 
 from moveit_configs_utils import MoveItConfigsBuilder
 
@@ -30,7 +31,8 @@ def generate_launch_description():
         get_package_share_directory(package_name),
         'worlds',
         #'minimal.world',
-        'built.world'
+        #'built.world',
+        'one_less_box.world'
         )    
     
     world = LaunchConfiguration('world')
@@ -48,12 +50,27 @@ def generate_launch_description():
                     launch_arguments={'gz_args': ['-r -v4 ', world], 'on_exit_shutdown': 'true'}.items()
              )
 
+    # Launch arguments for spawn pose
+    # ros2 launch gripperbot sim.launch.py x:=0.0 y:=0.0 z:=0.1
+    x_arg = DeclareLaunchArgument('x', default_value='1.0', description='X position of the robot')
+    y_arg = DeclareLaunchArgument('y', default_value='-0.035', description='Y position of the robot')
+    z_arg = DeclareLaunchArgument('z', default_value='0.15', description='Z position of the robot')
+
     # Run the spawner node from the ros_gz_sim package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='ros_gz_sim', executable='create',
                         arguments=['-topic', 'robot_description',
                                    '-name', 'my_bot',
-                                   '-z', '0.1'],
+                                   '-x', LaunchConfiguration('x'),
+                                   '-y', LaunchConfiguration('y'),
+                                   '-z', LaunchConfiguration('z')],
                         output='screen')
+
+    ## Run the spawner node from the ros_gz_sim package. The entity name doesn't really matter if you only have a single robot.
+    #spawn_entity_2 = Node(package='ros_gz_sim', executable='create',
+    #                    arguments=['-topic', 'robot_description',
+    #                               '-name', 'gripperbot',
+    #                               '-z', '0.1'],
+    #                    output='screen')                        
 
     #trajectory_controllers.yaml for gazebo
     joint_state_broadcaster_spawner = Node(
@@ -91,13 +108,23 @@ def generate_launch_description():
         arguments=["/camera/image_raw"]
     )
 
+    # A delay action, execute the spawn_entity after period = n sec.
+    spawn_entity_w_delay = TimerAction(
+        period=2.0,  
+        actions=[spawn_entity]
+    )
+
     # Launch them all!
     return LaunchDescription([
         rsp,
         moveit,
         world_arg,
         gazebo,
-        spawn_entity,
+        x_arg,
+        y_arg,
+        z_arg,
+        #spawn_entity_2,
+        spawn_entity_w_delay,
         joint_state_broadcaster_spawner,
         bot_grip_controller_spawner,
         top_grip_controller_spawner,

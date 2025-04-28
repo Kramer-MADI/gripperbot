@@ -3,6 +3,7 @@
 
   <!-- Includes -->
   <xacro:include filename="inertial_macros.xacro"/>
+  <!-- <xacro:include filename="beams.xacro"/> -->
 
   <!-- Materials -->
   <material name="silver">
@@ -25,6 +26,14 @@
 
   </link>
 
+  <!--
+  <joint name="base_link_joint" type="fixed">
+    <parent link="box_link"/>
+    <child link="base_link"/>
+    <origin xyz="0 -0.037 0.1" rpy="0 0 0"/>
+  </joint>
+  -->
+
   <joint name="base_link_joint" type="fixed">
     <parent link="universe"/>
     <child link="base_link"/>
@@ -33,11 +42,6 @@
 
   <!-- Link Definitions -->
   <link name="base_link">
-    <inertial>
-      <origin xyz="0.009225713675084443 0.0009395326248671956 0.16883786815064228" rpy="0 0 0"/>
-      <mass value="4.129738615288243"/>
-      <inertia ixx="0" iyy="0" izz="0" ixy="0" iyz="0" ixz="0"/>
-    </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -51,6 +55,11 @@
         <mesh filename="file://$(find gripperbot)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
+    <inertial>
+      <origin xyz="0.009225713675084443 0.0009395326248671956 0.16883786815064228" rpy="0 0 0"/>
+      <mass value="4.129738615288243"/>
+      <inertia ixx="0.004869" ixy="0" ixz="0" iyy="0.006843" iyz="0" izz="0.006671"/>
+    </inertial>
   </link>
 
   <link name="Component5_1">
